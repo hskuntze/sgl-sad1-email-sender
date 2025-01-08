@@ -1,0 +1,47 @@
+package br.eb.mil.sgl.emailsender.enums;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public enum TicketStatusEnum {
+
+	OPEN("ABERTO"), CLOSED("FECHADO"), CANCELED("CANCELADO"), CONFIRMED("CONFIRMADO"), ON_HOLD("EM ESPERA"),
+	IN_PROGRESS("EM ANDAMENTO"), SLA_STOPPED("SLA INTERROMPIDO"), APPROVED("APROVADO"),
+	WAITING_FOR_APPROVAL("AGUARDANDO APROVAÇÃO"), REJECTED("REJEITADO"), WAITING_FOR_CLOSURE("AGUARDANDO FECHAMENTO"),
+	WAITING_FOR_GUIDE_PRINT("AGUARDANDO RECOLHIMENTO DA GUIA"),
+	WAITING_FOR_MATERIAL_REPLACEMENT("AGUARDANDO SUBSTITUIÇÃO"),
+	WAITING_FOR_MOVEMENT_START("AGUARDANDO INÍCIO DE TRÂNSITO"), WAITING_FOR_REPAIR_END("AGUARDANDO FIM DO REPARO"),
+	WAITING_FOR_REPAIR_START("AGUARDANDO FIM DO TRANSPORTE"),
+	WAITING_FOR_MATERIAL_ON_OM("AGUARDANDO ENTRADA DE PATRIMÔNIO NA OM"), FAILURE_NOT_FOUND("FALHA NÃO ENCONTRADA"),
+	MAINTENANCE_MATERIAL_AVAILABLE_ON_OM("PATRIMÔNIO DISPONÍVEL NA OM"),
+	MAINTENANCE_MATERIAL_IN_MOVEMENT("PATRIMÔNIO EM TRÂNSITO PARA OM"),
+	MAINTENANCE_WAITING_FOR_GUIDE_PRINT("AGUARDANDO GUIA"),
+	NON_LAI_REPLACEMENT_MATERIAL_AVAILABLE_ON_OM("PATRIMÔNIO DISPONÍVEL NA OM (PATRIMÔNIO NÃO-LAI)"),
+	NON_LAI_REPLACEMENT_MATERIAL_IN_MOVEMENT("PATRIMÔNIO EM TRÂNSITO PARA OM (PATRIMÔNIO NÃO-LAI)"),
+	NON_LAI_REPLACEMENT_WAITING_FOR_GUIDE_PRINT("AGUARDANDO GUIA (PATRIMÔNIO NÃO-LAI)");
+
+	private final String displayName;
+	private static final Map<String, TicketStatusEnum> STRING_TO_ENUM_MAP = new HashMap<>();
+
+	static {
+		for (TicketStatusEnum status : TicketStatusEnum.values()) {
+			STRING_TO_ENUM_MAP.put(status.name(), status);
+		}
+	}
+
+	TicketStatusEnum(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public static TicketStatusEnum fromString(String status) {
+		TicketStatusEnum ticketStatus = STRING_TO_ENUM_MAP.get(status);
+		if (ticketStatus == null) {
+			throw new IllegalArgumentException("Status desconhecido: " + status);
+		}
+		return ticketStatus;
+	}
+}

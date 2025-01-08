@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<style>
+		.content {
+			background-color: #fff;
+			height: 700px;
+		}
+
+		p {
+			font-size: 15px;
+			color: #333;
+			margin: 3px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="content">
+		<p th:text="${introducao}"></p>
+		<p th:text="${chamado}"></p>
+		<p th:text="${status}"></p>
+		<p th:text="${dataHora}"></p>
+		<p th:text="${solicitante}"></p>
+		<p th:text="${material}"></p>
+		<p th:text="${numSerie}"></p>
+		<p th:text="${dadosFalha}"></p>
+		<p th:text="${comentarioFalha}"></p>
+		<p>Desconsidere esse e-mail caso não tenha conhecimento de tal sistema.</p>
+	</div>
+</body>
+
+</html>
