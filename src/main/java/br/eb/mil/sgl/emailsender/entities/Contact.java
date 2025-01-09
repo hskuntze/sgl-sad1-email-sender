@@ -26,6 +26,10 @@ public class Contact {
 	
 	public Contact() {
 	}
+	
+	public Contact(String value) {
+		this.value = value;
+	}
 
 	public Long getId() {
 		return id;

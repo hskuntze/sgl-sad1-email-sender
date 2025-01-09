@@ -1,9 +1,6 @@
 package br.eb.mil.sgl.emailsender.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public enum TicketStatusEnum {
+public enum TicketStatus {
 
 	OPEN("ABERTO"), CLOSED("FECHADO"), CANCELED("CANCELADO"), CONFIRMED("CONFIRMADO"), ON_HOLD("EM ESPERA"),
 	IN_PROGRESS("EM ANDAMENTO"), SLA_STOPPED("SLA INTERROMPIDO"), APPROVED("APROVADO"),
@@ -20,28 +17,22 @@ public enum TicketStatusEnum {
 	NON_LAI_REPLACEMENT_MATERIAL_IN_MOVEMENT("PATRIMÔNIO EM TRÂNSITO PARA OM (PATRIMÔNIO NÃO-LAI)"),
 	NON_LAI_REPLACEMENT_WAITING_FOR_GUIDE_PRINT("AGUARDANDO GUIA (PATRIMÔNIO NÃO-LAI)");
 
-	private final String displayName;
-	private static final Map<String, TicketStatusEnum> STRING_TO_ENUM_MAP = new HashMap<>();
-
-	static {
-		for (TicketStatusEnum status : TicketStatusEnum.values()) {
-			STRING_TO_ENUM_MAP.put(status.name(), status);
-		}
+	private final String description;
+	
+	TicketStatus(String status) {
+		this.description = status;
 	}
-
-	TicketStatusEnum(String displayName) {
-		this.displayName = displayName;
+	
+	public String getDescription() {
+		return this.description;
 	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public static TicketStatusEnum fromString(String status) {
-		TicketStatusEnum ticketStatus = STRING_TO_ENUM_MAP.get(status);
-		if (ticketStatus == null) {
-			throw new IllegalArgumentException("Status desconhecido: " + status);
-		}
-		return ticketStatus;
-	}
+	
+	public static String getDescriptionByName(String name) {
+        for (TicketStatus status : TicketStatus.values()) {
+            if (status.name().equalsIgnoreCase(name)) {
+                return status.getDescription();
+            }
+        }
+        throw new IllegalArgumentException("Status desconhecido: " + name);
+    }
 }

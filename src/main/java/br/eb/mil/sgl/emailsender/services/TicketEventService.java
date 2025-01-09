@@ -34,6 +34,7 @@ public class TicketEventService {
 		return ticketEventRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TicketEvent with ID " + id + " not found."));
 	}
 	
+	//A cada 60.4s faz a verificação de novos registros
 	@Scheduled(fixedRate = 60400)
 	public void findRecentTicketEvents() {
 		LocalDateTime now = LocalDateTime.now().plusHours(1);
@@ -46,5 +47,11 @@ public class TicketEventService {
 				emailService.sendTicketEventEmail(event);
 			}
 		}
+	}
+	
+	//A cada 24h limpa o cache interno
+	@Scheduled(fixedRate = 86400000)
+	public void cleanProcessedEventIds() {
+		processedEventIds.clear();
 	}
 }
