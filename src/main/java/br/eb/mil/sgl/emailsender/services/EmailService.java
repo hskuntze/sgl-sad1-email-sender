@@ -27,7 +27,7 @@ import br.eb.mil.sgl.emailsender.entities.Material;
 import br.eb.mil.sgl.emailsender.entities.Ticket;
 import br.eb.mil.sgl.emailsender.entities.TicketEvent;
 import br.eb.mil.sgl.emailsender.entities.User;
-import br.eb.mil.sgl.emailsender.enums.TicketStatusEnum;
+import br.eb.mil.sgl.emailsender.enums.TicketStatus;
 import br.eb.mil.sgl.emailsender.exceptions.EmailException;
 
 @Service
@@ -116,7 +116,7 @@ public class EmailService {
 						
 						variables.put("introducao", "Caro(a) " + user.getName() + ", ");
 						variables.put("chamado", " Há uma mensagem referente ao chamado '" + ticket.getBeanIdentifier() + "'.");
-						variables.put("status", "Status do chamado: " + TicketStatusEnum.fromString(ticket.getTicketStatus()) + ".");
+						variables.put("status", "Status do chamado: " + TicketStatus.getDescriptionByName(ticket.getTicketStatus()) + ".");
 						variables.put("dataHora", "Data e hora: " + event.getCreationDate().format(formatter) + ".");
 						variables.put("solicitante", "Solicitante: " + userRequester.getName() + ".");
 						variables.put("material", "Material: " + material.getEquipmentType().getName() + " (" + material.getEquipmentType().getPartNumber() + ").");
@@ -125,7 +125,7 @@ public class EmailService {
 						variables.put("comentarioFalha", "Comentário da falha: " + ticket.getFailureDescription());
 
 						//Aqui vai ser o "VALUE" do objeto "Contact"
-						helper.setTo("hskuntze@gmail.com");
+						helper.setTo(value);
 						helper.setSubject("[SISFRON - Sistema de Gerenciamento Logístico] Resumo do chamado - " + ticket.getBeanIdentifier());
 
 						Context context = new Context();
