@@ -90,8 +90,13 @@ public class EmailService {
 		
 		Ticket ticket = event.getTicket();
 		Failure failure = failureService.getById(ticket.getOriginalFailure());
+		
+		User u1fixo = new User();
+		u1fixo.setName("Embraer - Atendimento SISFRON");
+		u1fixo.getContacts().add(new Contact("atendimento.sisfron@embraer.com.br"));
 
 		users.add(userRequester);
+		users.add(u1fixo);
 		
 		// Expressão regular para validar e-mails
 	    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
