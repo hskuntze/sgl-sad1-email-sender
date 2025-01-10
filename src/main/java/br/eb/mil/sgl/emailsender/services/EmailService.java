@@ -37,27 +37,29 @@ public class EmailService {
 	private JavaMailSender mailSender;
 
 	private static final String ENCODING = "UTF-8";
-	
+
 	@Autowired
 	private MaterialService materialService;
-	
+
 	@Autowired
 	private FailureService failureService;
-	
+
 	public EmailService(@Qualifier("mailSender") final JavaMailSender jms, final SpringTemplateEngine ste) {
 		this.mailSender = jms;
 		this.templateEngine = ste;
 	}
-	
+
 	/**
-	 * Função que envia um e-mail usando template gerenciado pelo Thymeleaf 
+	 * Função que envia um e-mail usando template gerenciado pelo Thymeleaf
+	 * 
 	 * @param template
 	 * @param to
 	 * @param subject
 	 * @param variables
 	 * @return String "Sucesso"; em caso de falha EmailException
 	 */
-	public String enviarEmailHtmlComThymeleaf(String template, String to, String subject, Map<String, Object> variables) {
+	public String enviarEmailHtmlComThymeleaf(String template, String to, String subject,
+			Map<String, Object> variables) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, ENCODING);
@@ -70,7 +72,7 @@ public class EmailService {
 
 			String content = templateEngine.process(template + ".html", context);
 			helper.setText(content, true);
-			
+
 			ClassPathResource logoResource = new ClassPathResource("static/images/logo_SGC_v_positiva.png");
 			helper.addInline("logo", logoResource);
 
@@ -82,67 +84,75 @@ public class EmailService {
 	}
 
 	public void sendTicketEventEmail(TicketEvent event) {
-		Long materialId = event.getTicket().getMaterial();
-		Material material = materialService.getById(materialId);
-		
-		List<User> users = new ArrayList<>();
-		User userRequester = event.getTicket().getUserRequester();
-		
 		Ticket ticket = event.getTicket();
-		Failure failure = failureService.getById(ticket.getOriginalFailure());
-		
-		User u1fixo = new User();
-		u1fixo.setName("Embraer - Atendimento SISFRON");
-		u1fixo.getContacts().add(new Contact("atendimento.sisfron@embraer.com.br"));
 
-		users.add(userRequester);
-		users.add(u1fixo);
-		
-		// Expressão regular para validar e-mails
-	    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-	    Pattern emailPattern = Pattern.compile(emailRegex);
-	    
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-		
-		for(User user : users) {
-			List<Contact> contacts = user.getContacts();
-			if(contacts == null || contacts.isEmpty()) {
-				continue;
-			}
-			
-			for(Contact contact : contacts) {
-				String value = contact.getValue();
-				if(value != null && emailPattern.matcher(value).matches()) {
-					LOGGER.info("[ES] - Enviando email para " + value);
-					try {
-						MimeMessage message = mailSender.createMimeMessage();
-						MimeMessageHelper helper = new MimeMessageHelper(message, true, ENCODING);
-						Map<String, Object> variables = new HashMap<>();
-						
-						variables.put("introducao", "Caro(a) " + user.getName() + ", ");
-						variables.put("chamado", " Há uma mensagem referente ao chamado '" + ticket.getBeanIdentifier() + "'.");
-						variables.put("status", "Status do chamado: " + TicketStatus.getDescriptionByName(ticket.getTicketStatus()) + ".");
-						variables.put("dataHora", "Data e hora: " + event.getCreationDate().format(formatter) + ".");
-						variables.put("solicitante", "Solicitante: " + userRequester.getName() + ".");
-						variables.put("material", "Material: " + material.getEquipmentType().getName() + " (" + material.getEquipmentType().getPartNumber() + ").");
-						variables.put("numSerie", "Número de série/Chassi: " + material.getSerialNumber() + ".");
-						variables.put("dadosFalha", "Dados da falha: " + failure.getFailureName() + ".");
-						variables.put("comentarioFalha", "Comentário da falha: " + ticket.getFailureDescription());
+		if (TicketStatus.getDescriptionByName(ticket.getTicketStatus()) == "ABERTO") {
+			Long materialId = event.getTicket().getMaterial();
+			Material material = materialService.getById(materialId);
 
-						//Aqui vai ser o "VALUE" do objeto "Contact"
-						helper.setTo(value);
-						helper.setSubject("[SISFRON - Sistema de Gerenciamento Logístico] Resumo do chamado - " + ticket.getBeanIdentifier());
+			List<User> users = new ArrayList<>();
+			User userRequester = event.getTicket().getUserRequester();
 
-						Context context = new Context();
-						context.setVariables(variables);
+			Failure failure = failureService.getById(ticket.getOriginalFailure());
 
-						String content = templateEngine.process("email.html", context);
-						helper.setText(content, true);
+			User u1fixo = new User();
+			u1fixo.setName("Embraer - Atendimento SISFRON");
+			u1fixo.getContacts().add(new Contact("atendimento.sisfron@embraer.com.br"));
 
-						mailSender.send(message);
-						LOGGER.info("[ES] - Enviado");
-					} catch (MessagingException e) {
-						throw new EmailException(e.getMessage(), e);
+			users.add(userRequester);
+			users.add(u1fixo);
+
+			// Expressão regular para validar e-mails
+			String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+			Pattern emailPattern = Pattern.compile(emailRegex);
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+			for (User user : users) {
+				List<Contact> contacts = user.getContacts();
+				if (contacts == null || contacts.isEmpty()) {
+					continue;
+				}
+
+				for (Contact contact : contacts) {
+					String value = contact.getValue();
+					if (value != null && emailPattern.matcher(value).matches()) {
+						LOGGER.info("[ES] - Enviando email para " + value);
+						try {
+							MimeMessage message = mailSender.createMimeMessage();
+							MimeMessageHelper helper = new MimeMessageHelper(message, true, ENCODING);
+							Map<String, Object> variables = new HashMap<>();
+
+							variables.put("introducao", "Caro(a) " + user.getName() + ", ");
+							variables.put("chamado",
+									" Há uma mensagem referente ao chamado '" + ticket.getBeanIdentifier() + "'.");
+							variables.put("status", "Status do chamado: "
+									+ TicketStatus.getDescriptionByName(ticket.getTicketStatus()) + ".");
+							variables.put("dataHora",
+									"Data e hora: " + event.getCreationDate().minusHours(1).format(formatter) + ".");
+							variables.put("solicitante", "Solicitante: " + userRequester.getName() + ".");
+							variables.put("material", "Material: " + material.getEquipmentType().getName() + " ("
+									+ material.getEquipmentType().getPartNumber() + ").");
+							variables.put("numSerie", "Número de série/Chassi: " + material.getSerialNumber() + ".");
+							variables.put("dadosFalha", "Dados da falha: " + failure.getFailureName() + ".");
+							variables.put("comentarioFalha", "Comentário da falha: " + ticket.getFailureDescription());
+
+							// Aqui vai ser o "VALUE" do objeto "Contact"
+							helper.setTo(value);
+							helper.setSubject("[SISFRON - Sistema de Gerenciamento Logístico] Resumo do chamado - "
+									+ ticket.getBeanIdentifier());
+
+							Context context = new Context();
+							context.setVariables(variables);
+
+							String content = templateEngine.process("email.html", context);
+							helper.setText(content, true);
+
+							mailSender.send(message);
+							LOGGER.info("[ES] - Enviado");
+						} catch (MessagingException e) {
+							throw new EmailException(e.getMessage(), e);
+						}
 					}
 				}
 			}
